@@ -1,0 +1,13 @@
+{
+  "Author": "Nala Praline",
+  "Name": "ChatRelay",
+  "Punchline": "Relay FFXIV chat between two clients via WebSocket.",
+  "Description": "Synchronizes chat between two FFXIV clients via WebSocket. One client acts as a server, the other as a client. Relayed messages appear in chat with a [R] tag. Commands: /chatrelay, /cr",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "chat",
+    "relay",
+    "websocket",
+    "network"
+  ]
+}
