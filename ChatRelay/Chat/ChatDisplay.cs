@@ -16,6 +16,8 @@ public sealed class ChatDisplay : IDisposable
     private readonly IPluginLog log;
     private readonly ConcurrentQueue<ChatRelayMessage> messageQueue = new();
     private readonly List<string> recentMessages = new();
+    private readonly HashSet<string> recentHashes = new();
+    private readonly Queue<(string hash, DateTime time)> hashExpiry = new();
     private const int MaxRecentMessages = 200;
     public IReadOnlyList<string> RecentMessages => recentMessages;
     public bool HasPendingGlow { get; set; }
@@ -36,7 +38,25 @@ public sealed class ChatDisplay : IDisposable
 
     public void LogSentMessage(ChatRelayMessage msg)
     {
-        var logLine = $"[SENT] [{(XivChatType)msg.ChatType}] {msg.SenderName}";
+        string messageText;
+        try
+        {
+            var messageBytes = Convert.FromBase64String(msg.MessageBytes);
+            var messageSeString = SeString.Parse(messageBytes);
+            messageText = messageSeString.TextValue;
+        }
+        catch
+        {
+            messageText = "";
+        }
+
+        var hash = $"{msg.SenderName}:{msg.ChatType}:{messageText}";
+        PurgeExpiredHashes();
+        if (!recentHashes.Add(hash))
+            return;
+        hashExpiry.Enqueue((hash, DateTime.Now));
+
+        var logLine = $"[SENT] [{(XivChatType)msg.ChatType}] {msg.SenderName}: {messageText}";
         AddLogLine(logLine);
     }
 
@@ -70,6 +90,13 @@ public sealed class ChatDisplay : IDisposable
             messageText = "(failed to decode)";
         }
 
+        // Dedup check
+        var hash = $"{msg.SenderName}:{msg.ChatType}:{messageText}";
+        PurgeExpiredHashes();
+        if (!recentHashes.Add(hash))
+            return;
+        hashExpiry.Enqueue((hash, DateTime.Now));
+
         // Check for glow trigger
         if (configuration.GlowOnNumber && Regex.IsMatch(messageText, @"\d"))
             HasPendingGlow = true;
@@ -84,6 +111,12 @@ public sealed class ChatDisplay : IDisposable
         recentMessages.Add(line);
         while (recentMessages.Count > MaxRecentMessages)
             recentMessages.RemoveAt(0);
+    }
+
+    private void PurgeExpiredHashes()
+    {
+        while (hashExpiry.Count > 0 && hashExpiry.Peek().time < DateTime.Now.AddSeconds(-5))
+            recentHashes.Remove(hashExpiry.Dequeue().hash);
     }
 
     public void ClearMessages()
