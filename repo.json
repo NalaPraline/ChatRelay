@@ -5,7 +5,7 @@
     "InternalName": "ChatRelay",
     "Punchline": "Relay FFXIV chat between two clients via WebSocket.",
     "Description": "Synchronizes chat between two FFXIV clients via WebSocket. One client acts as a server, the other as a client. Relayed messages appear in chat with a [R] tag. Commands: /chatrelay, /cr",
-    "AssemblyVersion": "0.1.3.0",
+    "AssemblyVersion": "0.1.4.0",
     "DalamudApiLevel": 14,
     "ApplicableVersion": "any",
     "RepoUrl": "https://github.com/NalaPraline/ChatRelay",
@@ -20,8 +20,8 @@
     "IsTestingExclusive": false,
     "DownloadCount": 0,
     "LastUpdate": 1771082047,
-    "DownloadLinkInstall": "https://github.com/NalaPraline/ChatRelay/releases/download/v0.1.3/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/NalaPraline/ChatRelay/releases/download/v0.1.3/latest.zip",
-    "DownloadLinkTesting": "https://github.com/NalaPraline/ChatRelay/releases/download/v0.1.3/latest.zip"
+    "DownloadLinkInstall": "https://github.com/NalaPraline/ChatRelay/releases/download/v0.1.4/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/NalaPraline/ChatRelay/releases/download/v0.1.4/latest.zip",
+    "DownloadLinkTesting": "https://github.com/NalaPraline/ChatRelay/releases/download/v0.1.4/latest.zip"
   }
 ]
