@@ -10,6 +10,7 @@ namespace ChatRelay.Windows;
 public class MainWindow : Window, IDisposable
 {
     private readonly Plugin plugin;
+    private float glowTimer;
 
     public MainWindow(Plugin plugin)
         : base("ChatRelay##Main", ImGuiWindowFlags.None)
@@ -27,6 +28,26 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
+        // Glow effect when a number was detected and window is not focused
+        if (plugin.ChatDisplay.HasPendingGlow)
+        {
+            if (ImGui.IsWindowFocused())
+            {
+                plugin.ChatDisplay.HasPendingGlow = false;
+                glowTimer = 0;
+            }
+            else
+            {
+                glowTimer += ImGui.GetIO().DeltaTime;
+                var pulse = (float)(0.5 + 0.5 * Math.Sin(glowTimer * 4.0));
+                var color = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.6f, 0.0f, 0.4f + 0.6f * pulse));
+                var drawList = ImGui.GetWindowDrawList();
+                var pos = ImGui.GetWindowPos();
+                var size = ImGui.GetWindowSize();
+                drawList.AddRect(pos, pos + size, color, 0, 0, 2.0f + 2.0f * pulse);
+            }
+        }
+
         var manager = plugin.RelayManager;
 
         // Status
@@ -73,6 +94,12 @@ public class MainWindow : Window, IDisposable
         if (ImGui.Button("Settings"))
         {
             plugin.ToggleConfigUi();
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("Clear"))
+        {
+            plugin.ChatDisplay.ClearMessages();
         }
 
         ImGui.Spacing();

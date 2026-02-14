@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using ChatRelay.Models;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
@@ -17,6 +18,7 @@ public sealed class ChatDisplay : IDisposable
     private readonly List<string> recentMessages = new();
     private const int MaxRecentMessages = 200;
     public IReadOnlyList<string> RecentMessages => recentMessages;
+    public bool HasPendingGlow { get; set; }
 
     public ChatDisplay(IFramework framework, Configuration configuration, IPluginLog log)
     {
@@ -68,6 +70,10 @@ public sealed class ChatDisplay : IDisposable
             messageText = "(failed to decode)";
         }
 
+        // Check for glow trigger
+        if (configuration.GlowOnNumber && Regex.IsMatch(messageText, @"\d"))
+            HasPendingGlow = true;
+
         // Add to plugin window log
         var logLine = $"[{(XivChatType)msg.ChatType}] {msg.SenderName}: {messageText}";
         AddLogLine(logLine);
@@ -78,6 +84,11 @@ public sealed class ChatDisplay : IDisposable
         recentMessages.Add(line);
         while (recentMessages.Count > MaxRecentMessages)
             recentMessages.RemoveAt(0);
+    }
+
+    public void ClearMessages()
+    {
+        recentMessages.Clear();
     }
 
     public void Dispose()

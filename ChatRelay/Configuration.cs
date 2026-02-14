@@ -18,6 +18,7 @@ public class Configuration : IPluginConfiguration
     public bool ShowRelayTag { get; set; } = true;
     public bool ShowSentInLog { get; set; } = true;
     public bool RelayOwnMessages { get; set; } = false;
+    public bool GlowOnNumber { get; set; } = false;
 
     public HashSet<ushort> EnabledChatTypes { get; set; } = new()
     {

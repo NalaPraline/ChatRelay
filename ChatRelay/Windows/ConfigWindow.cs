@@ -140,6 +140,13 @@ public class ConfigWindow : Window, IDisposable
             configuration.Save();
         }
 
+        var glowOnNumber = configuration.GlowOnNumber;
+        if (ImGui.Checkbox("Glow on number in chat", ref glowOnNumber))
+        {
+            configuration.GlowOnNumber = glowOnNumber;
+            configuration.Save();
+        }
+
         ImGui.Spacing();
 
         // Chat type filters
